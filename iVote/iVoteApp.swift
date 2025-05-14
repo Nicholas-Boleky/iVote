@@ -22,10 +22,12 @@ struct iVoteApp: App {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
+    @StateObject private var appRouter = AppRouter()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(appRouter)
         }
         .modelContainer(sharedModelContainer)
     }
