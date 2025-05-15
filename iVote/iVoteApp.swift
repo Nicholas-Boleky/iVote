@@ -23,11 +23,13 @@ struct iVoteApp: App {
         }
     }()
     @StateObject private var appRouter = AppRouter()
+    @StateObject private var container = AppContainer()
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(appRouter)
+                .environmentObject(container)
         }
         .modelContainer(sharedModelContainer)
     }
