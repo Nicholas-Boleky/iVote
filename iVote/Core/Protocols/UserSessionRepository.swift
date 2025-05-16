@@ -22,5 +22,5 @@ protocol UserSessionRepository {
     /// Signs the user out, if supported by the backend.
     ///
     /// - Throws: An error if sign-out fails or is unsupported.
-    func signOut() async throws
+   // func signOut() async throws //this will not be implimented at this time because CloudKit does not support it. TODO: build extension on UserSessionRepository that supports signOut when we add support for firebase
 }
