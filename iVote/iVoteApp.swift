@@ -10,18 +10,18 @@ import SwiftData
 
 @main
 struct iVoteApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+//    var sharedModelContainer: ModelContainer = {
+//        let schema = Schema([
+//            
+//        ])
+//        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+//
+//        do {
+//            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+//        } catch {
+//            fatalError("Could not create ModelContainer: \(error)")
+//        }
+//    }()
     @StateObject private var appRouter = AppRouter()
     @StateObject private var container = AppContainer()
 
@@ -31,6 +31,6 @@ struct iVoteApp: App {
                 .environmentObject(appRouter)
                 .environmentObject(container)
         }
-        .modelContainer(sharedModelContainer)
+       // .modelContainer(sharedModelContainer)
     }
 }

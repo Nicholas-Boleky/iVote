@@ -6,17 +6,13 @@
 //
 
 import Foundation
-/// A central container for dependency injection. Provides access to repositories and shared services.
+/// A central container for dependency injection.
 @MainActor
 final class AppContainer: ObservableObject {
-    
-    // MARK: - Repository Instances
-    
+        
     let pollRepository: PollRepository
     let voteRepository: VoteRepository
     let userSessionRepository: UserSessionRepository
-
-    // MARK: - Init
     
     init(
         pollRepository: PollRepository = CloudKitPollRepository(),
