@@ -30,6 +30,7 @@ final class CloudKitPollRepository: PollRepository {
     
     func createPoll(_ poll: Poll) async throws {
         let record = CKRecord(recordType: "Poll")
+        record["type"] = poll.type.rawValue
         record["question"] = poll.question
         record["options"] = poll.options.map { $0.text } as NSArray
         record["createdAt"] = poll.createdAt
@@ -64,7 +65,9 @@ final class CloudKitPollRepository: PollRepository {
         guard
             let question = record["question"] as? String,
             let optionsArray = record["options"] as? [String],
-            let createdAt = record["createdAt"] as? Date
+            let createdAt = record["createdAt"] as? Date,
+            let typeString = record["type"] as? String,
+            let type = PollType(rawValue: typeString)
         else {
             throw PollRepositoryError.invalidRecord
         }
@@ -77,6 +80,7 @@ final class CloudKitPollRepository: PollRepository {
 
         return Poll(
             id: record.recordID.recordName,
+            type: type,
             question: question,
             options: options,
             createdAt: createdAt,

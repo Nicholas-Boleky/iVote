@@ -53,6 +53,7 @@ struct WireFrameCreatePollView: View {
     private func createPoll() async {
         let poll = Poll(
             id: UUID().uuidString,
+            type: .multipleChoice,
             question: "What’s your favorite fruit?",
             options: [
                 PollOption(id: UUID().uuidString, text: "Apple"),
