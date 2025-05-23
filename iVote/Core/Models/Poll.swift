@@ -8,9 +8,10 @@
 import Foundation
 
 struct Poll: Identifiable, Equatable {
-    var id: String
-    var question: String
-    var options: [PollOption]
+    let id: String
+    let type: PollType
+    let question: String
+    let options: [PollOption]
     let createdAt: Date
     let expiresAt: Date?
 }
@@ -18,4 +19,9 @@ struct Poll: Identifiable, Equatable {
 struct PollOption: Identifiable, Equatable {
     let id: String
     let text: String
+}
+
+enum PollType: String, Codable {
+    case multipleChoice
+    case freeform
 }
