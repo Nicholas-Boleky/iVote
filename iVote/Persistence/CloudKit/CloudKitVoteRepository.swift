@@ -10,7 +10,7 @@ import Foundation
 
 /// A CloudKit-based implementation of `VoteRepository`, using the public database.
 final class CloudKitVoteRepository: VoteRepository {
-    private let database: CKDatabase = CKContainer.default().publicCloudDatabase
+    private let database: CKDatabase = CKContainer(identifier: "iCloud.iVote").publicCloudDatabase
 
     // MARK: - Submit Vote
 

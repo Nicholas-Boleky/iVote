@@ -24,6 +24,8 @@ struct RootView: View {
                 Text("Vote Placeholder for poll \(id)")
             case .results(let id):
                 Text("Results Placeholder for poll \(id)")
+            case .wireframe:
+                WireframeMainView()
             }
         }
     }
@@ -31,4 +33,6 @@ struct RootView: View {
 
 #Preview {
     RootView()
+        .environment(AppRouter())
 }
+

@@ -19,7 +19,7 @@ final class CloudKitUserSessionRepository: UserSessionRepository {
             return cachedUser
         }
 
-        let recordID = try await CKContainer.default().userRecordID()
+        let recordID = try await CKContainer(identifier: "iCloud.iVote").userRecordID()
         let recordName = recordID.recordName
 
         let user = User(id: recordName, displayName: nil)

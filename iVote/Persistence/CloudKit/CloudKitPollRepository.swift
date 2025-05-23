@@ -10,7 +10,7 @@ import CloudKit
 
 /// A CloudKit-based implementation of `PollRepository` using the public iCloud database.
 final class CloudKitPollRepository: PollRepository {
-    private let database: CKDatabase = CKContainer.default().publicCloudDatabase
+    private let database: CKDatabase = CKContainer(identifier: "iCloud.iVote").publicCloudDatabase
     
     // MARK: - Fetch Polls
     
