@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct LandingPageView: View {
+    @EnvironmentObject var container: AppContainer
+    
     var body: some View {
         VStack(spacing: 40) {
             Spacer()
@@ -17,8 +19,12 @@ struct LandingPageView: View {
                 .bold()
             
             VStack(spacing: 20) {
-                Button("Create Poll") {
-                    //TODO: Hook into appRouter
+                NavigationLink {
+                    CreatePollView(
+                        viewModel: CreatePollViewModel(pollRepository: container.pollRepository)
+                    )
+                } label: {
+                    Text("Create Poll")
                 }
                 .buttonStyle(LandingButtonStyle())
                 
