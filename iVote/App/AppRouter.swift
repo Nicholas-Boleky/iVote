@@ -8,7 +8,7 @@
 import Foundation
 
 final class AppRouter: ObservableObject, Observable { //final to prevent subclassing, better performance
-    @Published var currentScreen: AppScreen = .wireframe
+    @Published var currentScreen: AppScreen = .landingPage
 }
 
 enum AppScreen {
@@ -18,4 +18,5 @@ enum AppScreen {
     case vote(pollID: String)
     case results(pollID: String)
     case wireframe
+    case landingPage
 }

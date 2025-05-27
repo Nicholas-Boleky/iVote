@@ -26,6 +26,8 @@ struct RootView: View {
                 Text("Results Placeholder for poll \(id)")
             case .wireframe:
                 WireframeMainView()
+            case .landingPage:
+                LandingPageView()
             }
         }
     }
