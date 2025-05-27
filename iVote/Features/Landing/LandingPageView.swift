@@ -10,7 +10,6 @@ import SwiftUI
 struct LandingPageView: View {
     @EnvironmentObject var container: AppContainer
     
-    
     var body: some View {
         VStack(spacing: 40) {
             Spacer()
