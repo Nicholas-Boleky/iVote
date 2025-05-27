@@ -28,8 +28,10 @@ struct LandingPageView: View {
                 }
                 .buttonStyle(LandingButtonStyle())
                 
-                Button("Vote in Open Poll") {
-                    //TODO: Hook into appRouter
+                NavigationLink {
+                    VoteByIDView()
+                } label: {
+                    Text("Vote in Open Poll")
                 }
                 .buttonStyle(LandingButtonStyle())
             }
