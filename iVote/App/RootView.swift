@@ -10,6 +10,7 @@ import SwiftData
 
 struct RootView: View {
     @EnvironmentObject var appRouter: AppRouter
+    @EnvironmentObject var container: AppContainer
 
     var body: some View {
         NavigationStack {
@@ -17,17 +18,24 @@ struct RootView: View {
             case .pollList:
                 Text("Poll List Placeholder")
             case .pollCreation:
-                Text("Poll Creation Placeholder")
+                CreatePollView(
+                        viewModel: CreatePollViewModel(
+                            pollRepository: container.pollRepository,
+                            appRouter: appRouter
+                        )
+                    )
             case .lobby(let id):
                 Text("Lobby Placeholder for poll \(id)")
             case .vote(let id):
-                Text("Vote Placeholder for poll \(id)")
+                VoteByIDView()
             case .results(let id):
                 Text("Results Placeholder for poll \(id)")
             case .wireframe:
                 WireframeMainView()
             case .landingPage:
                 LandingPageView()
+            case .sharePoll(let id):
+                SharePollView(pollID: id)
             }
         }
     }

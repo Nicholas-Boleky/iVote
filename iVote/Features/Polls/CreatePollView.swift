@@ -41,10 +41,19 @@ struct CreatePollView<ViewModel: CreatePollViewModeling>: View {
             }
             
             Section {
-                Button("Create Poll") {
-                    Task { await viewModel.submit() }
+                
+                if viewModel.isSubmitting {
+                    HStack {
+                        Spacer()
+                        ProgressView("Creating Poll...")
+                        Spacer()
+                    }
+                } else {
+                    Button("Create Poll") {
+                        Task { await viewModel.submit() }
+                    }
+                    .disabled(!viewModel.canSubmit)
                 }
-                .disabled(!viewModel.canSubmit)
             }
             
             if let status = viewModel.statusMessage {
@@ -52,11 +61,29 @@ struct CreatePollView<ViewModel: CreatePollViewModeling>: View {
                     Text(status).foregroundStyle(.blue)
                 }
             }
+            
+            // NavigationLink triggered by poll creation
+            if let id = viewModel.createdPollID {
+                NavigationLink(
+                    tag: id,
+                    selection: Binding<String?>(
+                        get: { viewModel.createdPollID },
+                        set: { viewModel.createdPollID = $0 }
+                    ),
+                    destination: {
+                        SharePollView(pollID: id)
+                    },
+                    label: {
+                        EmptyView()
+                    }
+                )
+                .hidden()
+            }
+
+        }
+        .navigationDestination(for: String.self) { pollID in
+            SharePollView(pollID: pollID)
         }
         .navigationTitle("Create Poll")
     }
-}
-
-#Preview {
-    //CreatePollView()
 }

@@ -33,18 +33,18 @@ struct WireFrameCreatePollView: View {
                 let status = try await CKContainer(identifier: "iCloud.iVote").accountStatus()
                 switch status {
                 case .available:
-                    print("✅ iCloud available")
+                    print("iCloud available")
                 case .noAccount:
-                    print("❌ No iCloud account")
+                    print("No iCloud account")
                 case .restricted:
-                    print("❌ iCloud restricted")
+                    print("iCloud restricted")
                 case .couldNotDetermine:
-                    print("❌ Could not determine iCloud status")
+                    print("Could not determine iCloud status")
                 @unknown default:
-                    print("❌ Unknown iCloud status")
+                    print("Unknown iCloud status")
                 }
             } catch {
-                print("❌ Failed to get account status: \(error.localizedDescription)")
+                print("Failed to get account status: \(error.localizedDescription)")
             }
         }
     }

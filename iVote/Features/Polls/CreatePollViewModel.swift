@@ -14,6 +14,8 @@ protocol CreatePollViewModeling: ObservableObject {
     var options: [String] { get set }
     var expiresAt: Date { get set }
     var statusMessage: String? { get }
+    var createdPollID: String? { get set }
+    var isSubmitting: Bool { get }
     
     var canSubmit: Bool { get }
     
@@ -22,18 +24,22 @@ protocol CreatePollViewModeling: ObservableObject {
 }
 
 @MainActor
-final class CreatePollViewModel: CreatePollViewModeling {
+final class CreatePollViewModel: ObservableObject, CreatePollViewModeling {
     @Published var question: String = ""
     @Published var type: PollType = .multipleChoice
     @Published var options: [String] = []
     //TODO: Revisit this default value
     @Published var expiresAt: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+    @Published var createdPollID: String? = nil
+    @Published var isSubmitting: Bool = false
     var statusMessage: String?
     
     private let pollRepository: PollRepository
+    private let appRouter: AppRouter
     
-    init(pollRepository: PollRepository) {
+    init(pollRepository: PollRepository, appRouter: AppRouter) {
         self.pollRepository = pollRepository
+        self.appRouter = appRouter
     }
     
     var canSubmit: Bool {
@@ -45,6 +51,10 @@ final class CreatePollViewModel: CreatePollViewModeling {
             statusMessage = "Please fill out all required fields."
             return
         }
+        
+        isSubmitting = true
+        defer { isSubmitting = false }
+        
         let validOptions = options
             .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
             .map { PollOption(id: UUID().uuidString, text: $0) }
@@ -59,8 +69,12 @@ final class CreatePollViewModel: CreatePollViewModeling {
         )
         
         do {
-            try await pollRepository.createPoll(poll)
+            let pollID = try await pollRepository.createPoll(poll)
             statusMessage = "Poll created successfully!"
+            createdPollID = pollID
+            DispatchQueue.main.async {
+                self.appRouter.navigate(to: .sharePoll(pollID: self.createdPollID ?? ""))
+            }
         } catch {
             statusMessage = "Error creating Poll: \(error.localizedDescription)"
         }

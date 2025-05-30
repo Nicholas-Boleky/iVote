@@ -22,7 +22,7 @@ protocol PollRepository {
         /// The repository implementation may auto-generate the poll's `id` if not provided.
         /// - Parameter poll: The poll to create.
         /// - Throws: A repository-specific error if creation fails.
-    func createPoll(_ poll: Poll) async throws
+    func createPoll(_ poll: Poll) async throws -> String
     
     /// Fetches a single poll by its unique identifier.
         ///

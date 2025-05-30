@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LandingPageView: View {
     @EnvironmentObject var container: AppContainer
+    @EnvironmentObject var appRouter: AppRouter
     
     var body: some View {
         VStack(spacing: 40) {
@@ -19,19 +20,13 @@ struct LandingPageView: View {
                 .bold()
             
             VStack(spacing: 20) {
-                NavigationLink {
-                    CreatePollView(
-                        viewModel: CreatePollViewModel(pollRepository: container.pollRepository)
-                    )
-                } label: {
-                    Text("Create Poll")
+                Button("Create Poll") {
+                    appRouter.navigate(to: .pollCreation)
                 }
                 .buttonStyle(LandingButtonStyle())
                 
-                NavigationLink {
-                    VoteByIDView()
-                } label: {
-                    Text("Vote in Open Poll")
+                Button("Vote in Open Poll") {
+                    appRouter.navigate(to: .vote(pollID: ""))
                 }
                 .buttonStyle(LandingButtonStyle())
             }
