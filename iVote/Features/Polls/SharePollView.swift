@@ -12,41 +12,43 @@ struct SharePollView: View {
     let pollID: String
     @State private var isSharing: Bool = false
     
-    var qrImage: UIImage? {
+    var qrImage: Image {
         generateQRCode(from: "iVote://vote?id=\(pollID)")
     }
+    //Haptic feedback when tapping the copy pollID label
+    let generator = UIImpactFeedbackGenerator(style: .light)
     
     var body: some View {
         
         VStack(spacing: 24) {
             Text("Share this poll")
                 .font(.title)
-            
-//             if let image = qrImage {
-            Image(uiImage: qrImage ?? UIImage())
-                    .interpolation(.none)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 240, height: 240)
-   //         }
+
+            qrImage
+                .interpolation(.none)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 240, height: 240)
             
             Text("Scan this code to vote")
                 .foregroundColor(.secondary)
             
-            Button("Share QR Code") {
-                isSharing = true
+            ShareLink(item: qrImage, preview: SharePreview("QR Code for Poll", image: qrImage)) {
+                Label("Share QR Code", systemImage: "square.and.arrow.up")
             }
-            .buttonStyle(.borderedProminent)
-            .sheet(isPresented: $isSharing) {
-                ShareLink(item: qrImage ?? UIImage(), preview: SharePreview("QR Code for Poll", image: qrImage ?? UIImage()))
-                //ShareLink(items: [qrImage])
-                //ShareSheet(activityItems: [qrImage])
-            }
+            
+            Text("Copy Poll ID to clipboard")
+                .foregroundColor(.blue)
+                .onTapGesture {
+                    generator.impactOccurred()
+                    UIPasteboard.general.string = pollID
+                }
+            
         }
         .padding()
     }
     
-    func generateQRCode(from string: String) -> UIImage {
+    func generateQRCode(from string: String) -> Image {
         
         let context = CIContext()
         let filter = CIFilter.qrCodeGenerator()
@@ -54,34 +56,13 @@ struct SharePollView: View {
         
         if let outputImage = filter.outputImage {
             if let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
-                return UIImage(cgImage: cgImage)
+                return Image(cgImage, scale: 1.0, label: Text("Poll Link"))
             }
         }
-        return UIImage(systemName: "xmark.circle") ?? UIImage()
+        return Image(systemName: "xmark.circle")
     }
 }
 
 #Preview {
     SharePollView(pollID: "262C430F-38B1-4063-A436-BBCB8E58113A")
 }
-//taken from https://developer.apple.com/forums/thread/747078
-//uiImage must conform to tranferable in order to be shared
-//TODO: future refactor
-extension UIImage: Transferable {
-        
-        public static var transferRepresentation: some TransferRepresentation {
-            
-            DataRepresentation(exportedContentType: .png) { image in
-                if let pngData = image.pngData() {
-                    return pngData
-                } else {
-                    // Handle the case where UIImage could not be converted to png.
-                    throw ConversionError.failedToConvertToPNG
-                }
-            }
-        }
-        
-        enum ConversionError: Error {
-            case failedToConvertToPNG
-        }
-    }
