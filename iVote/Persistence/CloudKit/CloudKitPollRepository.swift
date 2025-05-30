@@ -25,10 +25,10 @@ final class CloudKitPollRepository: PollRepository {
             return try parsePoll(from: record)
         }
     }
-
+    
     // MARK: - Create Poll
     
-    func createPoll(_ poll: Poll) async throws {
+    func createPoll(_ poll: Poll) async throws -> String {
         let record = CKRecord(recordType: "Poll")
         record["type"] = poll.type.rawValue
         record["question"] = poll.question
@@ -38,7 +38,19 @@ final class CloudKitPollRepository: PollRepository {
             record["expiresAt"] = expiresAt
         }
         
-        try await database.save(record)
+        return try await withCheckedThrowingContinuation { continuation in
+            database.save(record) { savedRecord, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let savedRecord = savedRecord {
+                    continuation.resume(returning: savedRecord.recordID.recordName)
+                } else {
+                    continuation.resume(throwing: NSError(domain: "PollSave", code: -1, userInfo: [
+                        NSLocalizedDescriptionKey: "Unknown error saving poll"
+                    ]))
+                }
+            }
+        }
     }
     
     // MARK: - Fetch Poll by ID
@@ -71,13 +83,13 @@ final class CloudKitPollRepository: PollRepository {
         else {
             throw PollRepositoryError.invalidRecord
         }
-
+        
         let options: [PollOption] = optionsArray.enumerated().map { index, text in
             PollOption(id: "\(record.recordID.recordName)_\(index)", text: text)
         }
-
+        
         let expiresAt = record["expiresAt"] as? Date
-
+        
         return Poll(
             id: record.recordID.recordName,
             type: type,

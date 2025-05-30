@@ -9,6 +9,10 @@ import Foundation
 
 final class AppRouter: ObservableObject, Observable { //final to prevent subclassing, better performance
     @Published var currentScreen: AppScreen = .landingPage
+    
+    func navigate(to screen: AppScreen) {
+        currentScreen = screen
+    }
 }
 
 enum AppScreen {
@@ -19,4 +23,5 @@ enum AppScreen {
     case results(pollID: String)
     case wireframe
     case landingPage
+    case sharePoll(pollID: String)
 }
