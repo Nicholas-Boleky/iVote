@@ -20,8 +20,7 @@ struct RootView: View {
             case .pollCreation:
                 CreatePollView(
                         viewModel: CreatePollViewModel(
-                            pollRepository: container.pollRepository,
-                            appRouter: appRouter
+                            pollRepository: container.pollRepository
                         )
                     )
             case .lobby(let id):
@@ -35,7 +34,7 @@ struct RootView: View {
             case .landingPage:
                 LandingPageView()
             case .sharePoll(let id):
-                SharePollView(pollID: id)
+                SharePollView(viewModel: SharePollViewModel(pollID: id))
             }
         }
     }

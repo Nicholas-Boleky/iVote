@@ -7,83 +7,78 @@
 
 import SwiftUI
 
-struct CreatePollView<ViewModel: CreatePollViewModeling>: View {
-    @ObservedObject var viewModel: ViewModel
+//struct CreatePollView<ViewModel: CreatePollViewModeling>: View {
+struct CreatePollView: View {
+    @EnvironmentObject var appRouter: AppRouter
+    @ObservedObject var viewModel: CreatePollViewModel
     
     var body: some View {
-        Form {
-            Section(header: Text("Question")) {
-                TextField("Enter the question for your Poll", text: $viewModel.question)
+        ZStack(alignment: .topLeading) {
+            Button {
+                appRouter.navigate(to: .landingPage)
+            } label: {
+                Label("Home", systemImage: "chevron.left")
             }
+            .padding()
             
-            Section(header: Text("Poll Type")) {
-                Picker("Poll Type", selection: $viewModel.type) {
-                    Text("Multiple Choice").tag(PollType.multipleChoice)
-                    Text("Freeform").tag(PollType.freeform)
+            Form {
+                Section(header: Text("Question")) {
+                    TextField("Enter the question for your Poll", text: $viewModel.question)
                 }
-                .pickerStyle(SegmentedPickerStyle())
-            }
-            
-            if viewModel.type == .multipleChoice {
-                Section(header: Text("Options")) {
-                    ForEach($viewModel.options.indices, id: \.self) { index in
-                        TextField("Option \(index + 1)", text: $viewModel.options[index])
-                    }
-                    Button("Add Option") {
-                        viewModel.options.append("")
-                    }
-                    .disabled(viewModel.options.count >= 10)
-                }
-            }
-            
-            Section(header: Text("Expiration")) {
-                DatePicker("Expires At", selection: $viewModel.expiresAt, displayedComponents: [.date, .hourAndMinute])
-            }
-            
-            Section {
                 
-                if viewModel.isSubmitting {
-                    HStack {
-                        Spacer()
-                        ProgressView("Creating Poll...")
-                        Spacer()
+                Section(header: Text("Poll Type")) {
+                    Picker("Poll Type", selection: $viewModel.type) {
+                        Text("Multiple Choice").tag(PollType.multipleChoice)
+                        Text("Freeform").tag(PollType.freeform)
                     }
-                } else {
-                    Button("Create Poll") {
-                        Task { await viewModel.submit() }
-                    }
-                    .disabled(!viewModel.canSubmit)
+                    .pickerStyle(SegmentedPickerStyle())
                 }
-            }
-            
-            if let status = viewModel.statusMessage {
+                
+                if viewModel.type == .multipleChoice {
+                    Section(header: Text("Options")) {
+                        ForEach($viewModel.options.indices, id: \.self) { index in
+                            TextField("Option \(index + 1)", text: $viewModel.options[index])
+                        }
+                        Button("Add Option") {
+                            viewModel.options.append("")
+                        }
+                        .disabled(viewModel.options.count >= 10)
+                    }
+                }
+                
+                Section(header: Text("Expiration")) {
+                    DatePicker("Expires At", selection: $viewModel.expiresAt, displayedComponents: [.date, .hourAndMinute])
+                }
+                
                 Section {
-                    Text(status).foregroundStyle(.blue)
+                    
+                    if viewModel.isSubmitting {
+                        HStack {
+                            Spacer()
+                            ProgressView("Creating Poll...")
+                            Spacer()
+                        }
+                    } else {
+                        Button("Create Poll") {
+                            Task { await viewModel.submit() }
+                        }
+                        .disabled(!viewModel.canSubmit)
+                    }
+                }
+                
+                if let status = viewModel.statusMessage {
+                    Section {
+                        Text(status).foregroundStyle(.blue)
+                    }
                 }
             }
-            
-            // NavigationLink triggered by poll creation
-            if let id = viewModel.createdPollID {
-                NavigationLink(
-                    tag: id,
-                    selection: Binding<String?>(
-                        get: { viewModel.createdPollID },
-                        set: { viewModel.createdPollID = $0 }
-                    ),
-                    destination: {
-                        SharePollView(pollID: id)
-                    },
-                    label: {
-                        EmptyView()
-                    }
-                )
-                .hidden()
+            .onChange(of: viewModel.didCreatePollWithID) { oldID, newID in
+                if let id = newID {
+                    appRouter.navigate(to: .sharePoll(pollID: id))
+                }
             }
-
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationTitle("Create Poll")
         }
-        .navigationDestination(for: String.self) { pollID in
-            SharePollView(pollID: pollID)
-        }
-        .navigationTitle("Create Poll")
     }
 }

@@ -65,7 +65,7 @@ struct WireFrameCreatePollView: View {
         )
 
         do {
-            try await container.pollRepository.createPoll(poll)
+            try await container.pollRepository.createPollAndReturnID(poll)
             await MainActor.run {
                 message = "Poll created successfully!"
             }

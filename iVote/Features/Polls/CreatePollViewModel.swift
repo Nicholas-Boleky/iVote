@@ -7,24 +7,24 @@
 
 import Foundation
 
-@MainActor
-protocol CreatePollViewModeling: ObservableObject {
-    var question: String { get set }
-    var type: PollType { get set }
-    var options: [String] { get set }
-    var expiresAt: Date { get set }
-    var statusMessage: String? { get }
-    var createdPollID: String? { get set }
-    var isSubmitting: Bool { get }
-    
-    var canSubmit: Bool { get }
-    
-    func submit() async
-    
-}
+//@MainActor
+//protocol CreatePollViewModeling: ObservableObject {
+//    var question: String { get set }
+//    var type: PollType { get set }
+//    var options: [String] { get set }
+//    var expiresAt: Date { get set }
+//    var statusMessage: String? { get }
+//    var createdPollID: String? { get set }
+//    var isSubmitting: Bool { get }
+//    
+//    var canSubmit: Bool { get }
+//    
+//    func submit() async
+//    
+//}
 
 @MainActor
-final class CreatePollViewModel: ObservableObject, CreatePollViewModeling {
+final class CreatePollViewModel: ObservableObject {
     @Published var question: String = ""
     @Published var type: PollType = .multipleChoice
     @Published var options: [String] = []
@@ -32,14 +32,13 @@ final class CreatePollViewModel: ObservableObject, CreatePollViewModeling {
     @Published var expiresAt: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     @Published var createdPollID: String? = nil
     @Published var isSubmitting: Bool = false
+    @Published var didCreatePollWithID: String?
     var statusMessage: String?
     
     private let pollRepository: PollRepository
-    private let appRouter: AppRouter
     
-    init(pollRepository: PollRepository, appRouter: AppRouter) {
+    init(pollRepository: PollRepository) {
         self.pollRepository = pollRepository
-        self.appRouter = appRouter
     }
     
     var canSubmit: Bool {
@@ -69,12 +68,10 @@ final class CreatePollViewModel: ObservableObject, CreatePollViewModeling {
         )
         
         do {
-            let pollID = try await pollRepository.createPoll(poll)
+            let pollID = try await pollRepository.createPollAndReturnID(poll)
             statusMessage = "Poll created successfully!"
             createdPollID = pollID
-            DispatchQueue.main.async {
-                self.appRouter.navigate(to: .sharePoll(pollID: self.createdPollID ?? ""))
-            }
+            didCreatePollWithID = pollID
         } catch {
             statusMessage = "Error creating Poll: \(error.localizedDescription)"
         }
