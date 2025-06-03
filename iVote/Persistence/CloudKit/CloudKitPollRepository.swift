@@ -28,7 +28,7 @@ final class CloudKitPollRepository: PollRepository {
     
     // MARK: - Create Poll
     
-    func createPoll(_ poll: Poll) async throws -> String {
+    func createPollAndReturnID(_ poll: Poll) async throws -> String {
         let record = CKRecord(recordType: "Poll")
         record["type"] = poll.type.rawValue
         record["question"] = poll.question
